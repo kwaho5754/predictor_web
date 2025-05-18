@@ -5,7 +5,7 @@
   <title>🌀 뒤 기준 예측</title>
   <style>
     body {
-      font-family: 'Segoe UI', sans-serif;
+      font-family: 'Segoe UI Emoji', 'Apple Color Emoji', 'Segoe UI', sans-serif;
       padding: 30px;
     }
     h1 {
@@ -61,11 +61,10 @@
 
         roundElem.textContent = `📁 예측 회차: ${data["예측회차"] || "없음"}`;
 
-        // 뒤 기준 출력
         backList.innerHTML = "";
         (data["뒤기준 예측값"] || []).forEach(item => {
           const li = document.createElement("li");
-          li.textContent = "✅ " + item;
+          li.textContent = item.includes("없음") ? "❌ " + item : "✅ " + item;
           backList.appendChild(li);
         });
 
@@ -76,7 +75,6 @@
       }
     }
 
-    // 자동 실행
     fetchPrediction();
   </script>
 </body>
