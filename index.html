@@ -1,94 +1,41 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8">
-  <title>뒤 기준 예측</title>
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR&display=swap" rel="stylesheet">
+  <meta charset="UTF-8" />
+  <title>사다리 예측 결과</title>
   <style>
-    body {
-      font-family: 'Noto Sans KR', sans-serif;
-      padding: 30px;
-    }
-    h1 {
-      font-size: 32px;
-      font-weight: bold;
-    }
-    button {
-      font-size: 16px;
-      padding: 8px 16px;
-      margin-bottom: 16px;
-    }
-    .result-block {
-      margin-top: 20px;
-    }
-    .section-title {
-      font-weight: bold;
-      font-size: 20px;
-      margin-top: 16px;
-    }
-    .error {
-      color: red;
-      font-weight: bold;
-    }
-    ul {
-      padding-left: 20px;
-    }
-    .good {
-      color: green;
-      font-weight: bold;
-    }
-    .bad {
-      color: red;
-      font-weight: bold;
-    }
+    body { font-family: sans-serif; padding: 30px; background: #f4f4f4; color: #333; }
+    h1 { color: #222; }
+    .result-box { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); width: 300px; }
+    ul { padding-left: 20px; }
+    li { margin-bottom: 10px; font-size: 1.2em; }
   </style>
 </head>
 <body>
-  <h1>뒤 기준 예측</h1>
-  <button onclick="fetchPrediction()">예측 실행</button>
-
-  <div class="result-block">
-    <p id="round">예측 회차: </p>
-
-    <div>
-      <div class="section-title">뒤 기준 Top 5</div>
-      <ul id="backList"><li>불러오는 중...</li></ul>
-    </div>
+  <h1>사다리 예측 Top3</h1>
+  <div class="result-box">
+    <p><strong>예측 회차:</strong> <span id="round">불러오는 중...</span></p>
+    <ul id="results">
+      <li>불러오는 중...</li>
+    </ul>
   </div>
 
   <script>
-    async function fetchPrediction() {
-      const roundElem = document.getElementById("round");
-      const backList = document.getElementById("backList");
-
-      roundElem.textContent = "예측 회차: 불러오는 중...";
-      backList.innerHTML = "<li>뒤 기준 예측값 불러오는 중...</li>";
-
-      try {
-        const response = await fetch("https://ladderpredictor-production.up.railway.app/predict");
-        const data = await response.json();
-
-        roundElem.textContent = `예측 회차: ${data["예측회차"] || "없음"}`;
-
-        backList.innerHTML = "";
-        (data["뒤기준 예측값"] || []).forEach(item => {
+    fetch("/predict")
+      .then(response => response.json())
+      .then(data => {
+        document.getElementById("round").textContent = data["예측회차"];
+        const ul = document.getElementById("results");
+        ul.innerHTML = "";
+        data["Top3 예측값"].forEach((item, index) => {
           const li = document.createElement("li");
-          if (item.includes("없음")) {
-            li.innerHTML = `<span class='bad'>[없음]</span> ${item}`;
-          } else {
-            li.innerHTML = `<span class='good'>[정상]</span> ${item}`;
-          }
-          backList.appendChild(li);
+          li.textContent = `${index + 1}위: ${item}`;
+          ul.appendChild(li);
         });
-
-      } catch (err) {
-        console.error("예측 실패:", err);
-        roundElem.textContent = "예측 회차: 예측 실패";
-        backList.innerHTML = "<li class='error'>뒤 기준 예측 실패</li>";
-      }
-    }
-
-    fetchPrediction();
+      })
+      .catch(error => {
+        document.getElementById("results").innerHTML = `<li>에러 발생: ${error}</li>`;
+      });
   </script>
 </body>
 </html>
