@@ -56,7 +56,7 @@
       backList.innerHTML = "<li>⏳ 뒤 기준 예측값 불러오는 중...</li>";
 
       try {
-        const response = await fetch("https://ladder-server-clean-production.up.railway.app/predict");
+        const response = await fetch("https://ladder-back-server.up.railway.app/predict");
         const data = await response.json();
 
         roundElem.textContent = `📁 예측 회차: ${data["예측회차"] || "없음"}`;
