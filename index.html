@@ -6,7 +6,7 @@
   <style>
     body { font-family: sans-serif; padding: 30px; background: #f4f4f4; color: #333; }
     h1 { color: #222; }
-    .result-box { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); width: 300px; }
+    .result-box { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); width: 350px; }
     ul { padding-left: 20px; }
     li { margin-bottom: 10px; font-size: 1.2em; }
   </style>
@@ -29,7 +29,7 @@
         ul.innerHTML = "";
         data["Top3 예측값"].forEach((item, index) => {
           const li = document.createElement("li");
-          li.textContent = `${index + 1}위: ${item}`;
+          li.textContent = `${index + 1}위: ${item.value} (빈도: ${item.count})`;
           ul.appendChild(li);
         });
       })
