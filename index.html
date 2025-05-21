@@ -6,18 +6,26 @@
   <style>
     body { font-family: sans-serif; padding: 30px; background: #f4f4f4; color: #333; }
     h1 { color: #222; }
-    .result-box { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); width: 350px; }
+    .result-box { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); width: 400px; margin-bottom: 30px; }
     ul { padding-left: 20px; }
-    li { margin-bottom: 10px; font-size: 1.2em; }
+    li { margin-bottom: 10px; font-size: 1.1em; }
   </style>
 </head>
 <body>
   <h1>사다리 예측 Top3</h1>
+
   <div class="result-box">
     <p><strong>예측 회차:</strong> <span id="round">불러오는 중...</span></p>
-    <ul id="results">
-      <li>불러오는 중...</li>
-    </ul>
+  </div>
+
+  <div class="result-box">
+    <h3>✅ 원본 블럭 기준</h3>
+    <ul id="original-list"><li>불러오는 중...</li></ul>
+  </div>
+
+  <div class="result-box">
+    <h3>🔁 대칭 블럭 기준</h3>
+    <ul id="mirror-list"><li>불러오는 중...</li></ul>
   </div>
 
   <script>
@@ -25,16 +33,23 @@
       .then(response => response.json())
       .then(data => {
         document.getElementById("round").textContent = data["예측회차"];
-        const ul = document.getElementById("results");
-        ul.innerHTML = "";
-        data["Top3 예측값"].forEach((item, index) => {
-          const li = document.createElement("li");
-          li.textContent = `${index + 1}위: ${item.value} (빈도: ${item.count})`;
-          ul.appendChild(li);
-        });
+
+        function render(listId, items) {
+          const ul = document.getElementById(listId);
+          ul.innerHTML = "";
+          items.forEach((item, index) => {
+            const li = document.createElement("li");
+            li.textContent = `${index + 1}위: ${item.value} (빈도: ${item.count})`;
+            ul.appendChild(li);
+          });
+        }
+
+        render("original-list", data["원본 Top3"]);
+        render("mirror-list", data["대칭 Top3"]);
       })
       .catch(error => {
-        document.getElementById("results").innerHTML = `<li>에러 발생: ${error}</li>`;
+        document.getElementById("original-list").innerHTML = `<li>에러 발생</li>`;
+        document.getElementById("mirror-list").innerHTML = `<li>에러 발생</li>`;
       });
   </script>
 </body>
