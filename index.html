@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8" />
-  <title>사다리 예측 결과</title>
+  <title>사다리 예측 결과 (가중치 Top3)</title>
   <style>
     body { font-family: sans-serif; padding: 30px; background: #f4f4f4; color: #333; }
     h1 { color: #222; }
@@ -12,7 +12,7 @@
   </style>
 </head>
 <body>
-  <h1>사다리 예측 Top3</h1>
+  <h1>사다리 예측 결과 (가중치 Top3)</h1>
 
   <div class="result-box">
     <p><strong>예측 회차:</strong> <span id="round">불러오는 중...</span></p>
@@ -39,7 +39,7 @@
           ul.innerHTML = "";
           items.forEach((item, index) => {
             const li = document.createElement("li");
-            li.textContent = `${index + 1}위: ${item.value} (빈도: ${item.count})`;
+            li.textContent = `${index + 1}위: ${item.value} (점수: ${item.score})`;
             ul.appendChild(li);
           });
         }
