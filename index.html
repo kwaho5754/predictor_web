@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8" />
-  <title>사다리 예측 결과 (정방향 가중치 Top3)</title>
+  <title>사다리 예측 결과 (역방향 점수제)</title>
   <style>
     body { font-family: sans-serif; padding: 30px; background: #f4f4f4; color: #333; }
     h1 { color: #222; }
@@ -13,50 +13,66 @@
   </style>
 </head>
 <body>
-  <h1>사다리 예측 결과 (정방향 가중치 Top3)</h1>
+  <h1>사다리 예측 결과 (역방향 점수제)</h1>
 
   <div class="result-box">
     <p><strong>예측 회차:</strong> <span id="round">불러오는 중...</span></p>
     <p class="description">
-      본 시스템은 <strong>최근 288줄</strong> 데이터를 <strong>위에서 아래</strong> 방향으로 분석하며,<br>
-      고정된 2~5줄 블럭을 기준으로 과거 동일 블럭 패턴을 탐색합니다.<br><br>
-      블럭 일치 시 <strong>해당 블럭 위 또는 아래 줄의 결과값</strong>에 가중치를 부여하여 <strong>Top3 예측값</strong>을 도출합니다.<br>
-      분석은 <strong>원본 블럭</strong>과 <strong>대칭 블럭</strong>을 각각 따로 수행합니다.
+      본 시스템은 <strong>최근 288줄</strong> 데이터를 <strong>아래에서 위</strong> 방향으로 분석하며,<br>
+      시작방향 / 줄 수 / 홀짝 각각에 대해 다음 요소를 점수화합니다:<br><br>
+      ✅ 최근 20줄의 등장 빈도<br>
+      ✅ 전체 288줄의 등장 빈도<br>
+      ✅ 동일 블럭 반복 출현 보정<br>
+      ✅ 좌/우 또는 홀/짝 편향 시 반대 보정<br>
+      ✅ 동일 값의 연속 등장 시 감점<br><br>
+      이를 종합하여 가장 점수가 높은 예측값을 항목별로 Top1로 도출합니다.
     </p>
   </div>
 
   <div class="result-box">
-    <h3>✅ 원본 블럭 기준 (위 → 아래)</h3>
-    <ul id="original-list"><li>불러오는 중...</li></ul>
+    <h3>✅ 시작방향</h3>
+    <ul id="start-list"><li>불러오는 중...</li></ul>
   </div>
 
   <div class="result-box">
-    <h3>🔁 대칭 블럭 기준 (위 → 아래)</h3>
-    <ul id="mirror-list"><li>불러오는 중...</li></ul>
+    <h3>✅ 줄 수</h3>
+    <ul id="line-list"><li>불러오는 중...</li></ul>
+  </div>
+
+  <div class="result-box">
+    <h3>✅ 홀 / 짝</h3>
+    <ul id="oe-list"><li>불러오는 중...</li></ul>
   </div>
 
   <script>
-    fetch("https://ladderpredictor-production.up.railway.app/predict")
+    fetch("/predict")
       .then(response => response.json())
       .then(data => {
         document.getElementById("round").textContent = data["예측회차"];
 
-        function render(listId, items) {
+        function render(listId, obj) {
           const ul = document.getElementById(listId);
           ul.innerHTML = "";
-          items.forEach((item, index) => {
-            const li = document.createElement("li");
-            li.textContent = `${index + 1}위: ${item.value} (점수: ${item.score})`;
-            ul.appendChild(li);
-          });
+          const li = document.createElement("li");
+          li.innerHTML = `
+            예측값: <strong>${obj.value}</strong> (점수: ${obj.score})<br>
+            - 최근 20줄: ${obj.recent}회<br>
+            - 전체 288줄: ${obj.total}회<br>
+            - 근거:<br>
+            <ul>${obj.reasons.map(r => `<li>${r}</li>`).join('')}</ul>
+          `;
+          ul.appendChild(li);
         }
 
-        render("original-list", data["원본 Top3"]);
-        render("mirror-list", data["대칭 Top3"]);
+        const result = data["예측값"];
+        render("start-list", result["시작방향"]);
+        render("line-list", result["줄수"]);
+        render("oe-list", result["홀짝"]);
       })
       .catch(error => {
-        document.getElementById("original-list").innerHTML = `<li>에러 발생</li>`;
-        document.getElementById("mirror-list").innerHTML = `<li>에러 발생</li>`;
+        document.getElementById("start-list").innerHTML = `<li>에러 발생</li>`;
+        document.getElementById("line-list").innerHTML = `<li>에러 발생</li>`;
+        document.getElementById("oe-list").innerHTML = `<li>에러 발생</li>`;
       });
   </script>
 </body>
