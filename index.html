@@ -1,16 +1,19 @@
-<!-- ⬇️ index.html — Top3 예측 결과 출력 구조 (역방향 점수제) -->
+<!-- ⬇️ index.html — 역방향 점수제 결과 출력 (Railway 백엔드 연결) -->
 
 <!DOCTYPE html>
 <html lang="ko">
 <head>
   <meta charset="UTF-8" />
-  <title>사다리 블럭 예측 결과 (역방향)</title>
+  <title>사다리 예측 결과</title>
   <style>
     body {
       font-family: sans-serif;
       padding: 30px;
       background: #f4f4f4;
       color: #333;
+    }
+    h1 {
+      color: #222;
     }
     .result-box {
       background: white;
@@ -19,9 +22,6 @@
       box-shadow: 0 0 8px rgba(0,0,0,0.1);
       max-width: 700px;
       margin-bottom: 30px;
-    }
-    h1 {
-      color: #222;
     }
     ul {
       padding-left: 20px;
@@ -43,7 +43,7 @@
 </head>
 <body>
   <div class="result-box">
-    <h1>사다리 예측 결과 (역방향)</h1>
+    <h1>사다리 예측 결과</h1>
     <p><strong id="round">예측 회차: 불러오는 중...</strong></p>
     <ul id="result-list">
       <li>불러오는 중...</li>
@@ -51,8 +51,9 @@
   </div>
 
   <script>
-    fetch("/predict")
-      .then(data => data.json())
+    // ✅ Railway에 배포된 백엔드 서버로 API 요청
+    fetch("https://ladderpredictor-production.up.railway.app/predict")
+      .then(response => response.json())
       .then(data => {
         const ul = document.getElementById("result-list");
         const round = document.getElementById("round");
