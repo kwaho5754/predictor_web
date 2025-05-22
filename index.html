@@ -2,29 +2,36 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8" />
-  <title>사다리 예측 결과 (가중치 Top3)</title>
+  <title>사다리 예측 결과 (정방향 가중치 Top3)</title>
   <style>
     body { font-family: sans-serif; padding: 30px; background: #f4f4f4; color: #333; }
     h1 { color: #222; }
-    .result-box { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); width: 400px; margin-bottom: 30px; }
+    .result-box { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); width: 480px; margin-bottom: 30px; }
     ul { padding-left: 20px; }
     li { margin-bottom: 10px; font-size: 1.1em; }
+    p.description { font-size: 0.95em; color: #555; line-height: 1.6em; }
   </style>
 </head>
 <body>
-  <h1>사다리 예측 결과 (가중치 Top3)</h1>
+  <h1>사다리 예측 결과 (정방향 가중치 Top3)</h1>
 
   <div class="result-box">
     <p><strong>예측 회차:</strong> <span id="round">불러오는 중...</span></p>
+    <p class="description">
+      본 시스템은 <strong>최근 288줄</strong> 데이터를 <strong>위에서 아래</strong> 방향으로 분석하며,<br>
+      고정된 2~5줄 블럭을 기준으로 과거 동일 블럭 패턴을 탐색합니다.<br><br>
+      블럭 일치 시 <strong>해당 블럭 위 또는 아래 줄의 결과값</strong>에 가중치를 부여하여 <strong>Top3 예측값</strong>을 도출합니다.<br>
+      분석은 <strong>원본 블럭</strong>과 <strong>대칭 블럭</strong>을 각각 따로 수행합니다.
+    </p>
   </div>
 
   <div class="result-box">
-    <h3>✅ 원본 블럭 기준</h3>
+    <h3>✅ 원본 블럭 기준 (위 → 아래)</h3>
     <ul id="original-list"><li>불러오는 중...</li></ul>
   </div>
 
   <div class="result-box">
-    <h3>🔁 대칭 블럭 기준</h3>
+    <h3>🔁 대칭 블럭 기준 (위 → 아래)</h3>
     <ul id="mirror-list"><li>불러오는 중...</li></ul>
   </div>
 
