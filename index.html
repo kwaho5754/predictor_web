@@ -1,78 +1,84 @@
+<!-- ⬇️ index.html — Top3 예측 결과 출력 구조 (역방향 점수제) -->
+
 <!DOCTYPE html>
 <html lang="ko">
 <head>
   <meta charset="UTF-8" />
-  <title>사다리 예측 결과 (역방향 점수제)</title>
+  <title>사다리 블럭 예측 결과 (역방향)</title>
   <style>
-    body { font-family: sans-serif; padding: 30px; background: #f4f4f4; color: #333; }
-    h1 { color: #222; }
-    .result-box { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); width: 480px; margin-bottom: 30px; }
-    ul { padding-left: 20px; }
-    li { margin-bottom: 10px; font-size: 1.1em; }
-    p.description { font-size: 0.95em; color: #555; line-height: 1.6em; }
+    body {
+      font-family: sans-serif;
+      padding: 30px;
+      background: #f4f4f4;
+      color: #333;
+    }
+    .result-box {
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 0 8px rgba(0,0,0,0.1);
+      max-width: 700px;
+      margin-bottom: 30px;
+    }
+    h1 {
+      color: #222;
+    }
+    ul {
+      padding-left: 20px;
+      font-size: 1.1em;
+    }
+    li {
+      margin-bottom: 16px;
+    }
+    .score {
+      font-weight: bold;
+      color: #0055aa;
+    }
+    .detail {
+      font-size: 0.95em;
+      color: #555;
+      margin-top: 4px;
+    }
   </style>
 </head>
 <body>
-  <h1>사다리 예측 결과 (역방향 점수제)</h1>
-
   <div class="result-box">
-    <p><strong>예측 회차:</strong> <span id="round">불러오는 중...</span></p>
-    <p class="description">
-      본 시스템은 <strong>최근 288줄</strong> 데이터를 <strong>아래에서 위</strong> 방향으로 분석하며,<br>
-      시작방향 / 줄 수 / 홀짝 각각에 대해 다음 요소를 점수화합니다:<br><br>
-      ✅ 최근 20줄의 등장 빈도<br>
-      ✅ 전체 288줄의 등장 빈도<br>
-      ✅ 동일 블럭 반복 출현 보정<br>
-      ✅ 좌/우 또는 홀/짝 편향 시 반대 보정<br>
-      ✅ 동일 값의 연속 등장 시 감점<br><br>
-      이를 종합하여 가장 점수가 높은 예측값을 항목별로 Top1로 도출합니다.
-    </p>
-  </div>
-
-  <div class="result-box">
-    <h3>✅ 시작방향</h3>
-    <ul id="start-list"><li>불러오는 중...</li></ul>
-  </div>
-
-  <div class="result-box">
-    <h3>✅ 줄 수</h3>
-    <ul id="line-list"><li>불러오는 중...</li></ul>
-  </div>
-
-  <div class="result-box">
-    <h3>✅ 홀 / 짝</h3>
-    <ul id="oe-list"><li>불러오는 중...</li></ul>
+    <h1>사다리 예측 결과 (역방향)</h1>
+    <p><strong id="round">예측 회차: 불러오는 중...</strong></p>
+    <ul id="result-list">
+      <li>불러오는 중...</li>
+    </ul>
   </div>
 
   <script>
-    fetch("https://ladderpredictor-production.up.railway.app/predict")
-      .then(response => response.json())
+    fetch("/predict")
+      .then(data => data.json())
       .then(data => {
-        document.getElementById("round").textContent = data["예측회차"];
+        const ul = document.getElementById("result-list");
+        const round = document.getElementById("round");
+        ul.innerHTML = "";
+        round.textContent = `예측 회차: ${data["예측회차"]}회`;
 
-        function render(listId, obj) {
-          const ul = document.getElementById(listId);
-          ul.innerHTML = "";
+        data["Top3"].forEach((item, idx) => {
           const li = document.createElement("li");
-          li.innerHTML = `
-            예측값: <strong>${obj.value}</strong> (점수: ${obj.score})<br>
-            - 최근 20줄: ${obj.recent}회<br>
-            - 전체 288줄: ${obj.total}회<br>
-            - 근거:<br>
-            <ul>${obj.reasons.map(r => `<li>${r}</li>`).join('')}</ul>
-          `;
-          ul.appendChild(li);
-        }
+          li.innerHTML = `<span class='score'>${idx + 1}위: ${item.값} (점수: ${item.점수})</span>`;
 
-        const result = data["예측값"];
-        render("start-list", result["시작방향"]);
-        render("line-list", result["줄수"]);
-        render("oe-list", result["홀짝"]);
+          const details = Object.entries(item.근거)
+            .map(([key, val]) => `- ${key}: ${val}회`)
+            .join("<br>");
+
+          if (details) {
+            const detailDiv = document.createElement("div");
+            detailDiv.className = "detail";
+            detailDiv.innerHTML = details;
+            li.appendChild(detailDiv);
+          }
+
+          ul.appendChild(li);
+        });
       })
-      .catch(error => {
-        document.getElementById("start-list").innerHTML = `<li>에러 발생</li>`;
-        document.getElementById("line-list").innerHTML = `<li>에러 발생</li>`;
-        document.getElementById("oe-list").innerHTML = `<li>에러 발생</li>`;
+      .catch(() => {
+        document.getElementById("result-list").innerHTML = "<li>서버 오류</li>";
       });
   </script>
 </body>
