@@ -1,4 +1,4 @@
-<!-- ⬇️ index.html — 역방향 점수제 결과 출력 (Railway 백엔드 연결) -->
+<!-- ⬇️ index.html — 정방향 3줄 블럭 원본 매칭 예측 결과 -->
 
 <!DOCTYPE html>
 <html lang="ko">
@@ -34,11 +34,6 @@
       font-weight: bold;
       color: #0055aa;
     }
-    .detail {
-      font-size: 0.95em;
-      color: #555;
-      margin-top: 4px;
-    }
   </style>
 </head>
 <body>
@@ -51,7 +46,7 @@
   </div>
 
   <script>
-    // ✅ Railway에 배포된 백엔드 서버로 API 요청
+    // ✅ 정방향 블럭 기반 예측 결과 받아오기
     fetch("https://ladderpredictor-production.up.railway.app/predict")
       .then(response => response.json())
       .then(data => {
@@ -62,19 +57,7 @@
 
         data["Top3"].forEach((item, idx) => {
           const li = document.createElement("li");
-          li.innerHTML = `<span class='score'>${idx + 1}위: ${item.값} (점수: ${item.점수})</span>`;
-
-          const details = Object.entries(item.근거)
-            .map(([key, val]) => `- ${key}: ${val}회`)
-            .join("<br>");
-
-          if (details) {
-            const detailDiv = document.createElement("div");
-            detailDiv.className = "detail";
-            detailDiv.innerHTML = details;
-            li.appendChild(detailDiv);
-          }
-
+          li.innerHTML = `<span class='score'>${idx + 1}위: ${item["값"]} (${item["횟수"]}회)</span>`;
           ul.appendChild(li);
         });
       })
